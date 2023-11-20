@@ -87,15 +87,12 @@ class ChatService:
             sources = [
                 Chunk.from_node(node) for node in streaming_response.source_nodes
             ]
-            completion_gen = CompletionGen(
+            return CompletionGen(
                 response=streaming_response.response_gen, sources=sources
             )
         else:
             stream = self.llm_service.llm.stream_chat(messages)
-            completion_gen = CompletionGen(
-                response=stream_chat_response_to_tokens(stream)
-            )
-        return completion_gen
+            return CompletionGen(response=stream_chat_response_to_tokens(stream))
 
     def chat(
         self,
@@ -111,10 +108,9 @@ class ChatService:
                 chat_history=messages[:-1],
             )
             sources = [Chunk.from_node(node) for node in wrapped_response.source_nodes]
-            completion = Completion(response=wrapped_response.response, sources=sources)
+            return Completion(response=wrapped_response.response, sources=sources)
         else:
             chat_response = self.llm_service.llm.chat(messages)
             response_content = chat_response.message.content
             response = response_content if response_content is not None else ""
-            completion = Completion(response=response)
-        return completion
+            return Completion(response=response)
